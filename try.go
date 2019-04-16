@@ -30,11 +30,11 @@ func Try(fn func(assert *assert.Assert)) *_try {
 	defer func() {
 		defer func() {
 			if r := recover(); r != nil {
-				switch r.(type) {
+				switch d := r.(type) {
 				case error:
-					t.err = r.(error)
+					t.err = d
 				case string:
-					t.err = errors.New(r.(string))
+					t.err = errors.New(d)
 				}
 			}
 		}()
