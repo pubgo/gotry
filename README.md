@@ -1,0 +1,2 @@
+# gotry
+gotry for go
