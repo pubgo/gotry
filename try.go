@@ -20,7 +20,7 @@ func (t *_try) Catch(fn func(err error)) {
 	fn(t.err)
 }
 
-func Try(fn func(assert *assert.Assert)) *_try {
+func Try(fn func()) *_try {
 	assert.Bool(fn == nil, "the func is nil")
 
 	_v := reflect.TypeOf(fn)
@@ -38,7 +38,7 @@ func Try(fn func(assert *assert.Assert)) *_try {
 				}
 			}
 		}()
-		t.params = reflect.ValueOf(fn).Call([]reflect.Value{reflect.ValueOf(_assert)})
+		t.params = reflect.ValueOf(fn).Call([]reflect.Value{})
 	}()
 	return t
 }
