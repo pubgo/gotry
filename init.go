@@ -1,4 +1,4 @@
-package try
+package gotry
 
 import "github.com/pubgo/assert"
 
