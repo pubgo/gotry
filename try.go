@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/pubgo/assert"
 	"reflect"
+	"fmt"
 )
 
 type _try struct {
@@ -22,6 +23,12 @@ func (t *_try) Catch(fn func(err error)) {
 
 func (t *_try) Error() error {
 	return t.err
+}
+
+func (t *_try) P() {
+	if t.err != nil {
+		fmt.Println(t.err)
+	}
 }
 
 func Try(fn func()) *_try {
