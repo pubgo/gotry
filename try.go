@@ -20,6 +20,10 @@ func (t *_try) Catch(fn func(err error)) {
 	fn(t.err)
 }
 
+func (t *_try) Error() error {
+	return t.err
+}
+
 func Try(fn func()) *_try {
 	assert.Bool(fn == nil, "the func is nil")
 
