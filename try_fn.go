@@ -10,6 +10,10 @@ type _try_fn struct {
 	_values []reflect.Value
 }
 
+func (t *_try_fn) Assert() {
+	assert.MustNotError(t.err)
+}
+
 func (t *_try_fn) Error() error {
 	return t.err
 }
