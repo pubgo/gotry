@@ -14,11 +14,9 @@ func Retry(num int, fn func() error) (err error) {
 	return
 }
 
-func Ticker(dur time.Duration, fn func(dur time.Duration) bool) bool {
-	_dur := time.Duration(0)
-	for fn(_dur) {
+func Ticker(dur time.Duration, fn func(c int) bool) bool {
+	for i := 0; fn(i); i++ {
 		time.Sleep(dur)
-		_dur += dur
 	}
 	return false
 }
