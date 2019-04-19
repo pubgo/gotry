@@ -1,15 +1,12 @@
 package gotry
 
 import (
-	"github.com/pubgo/assert"
 	"time"
 )
 
 func Retry(num int, fn func() error) (err error) {
 	for i := 0; i < num; i++ {
-		if err = Try(func() {
-			assert.MustNotError(fn())
-		}).Error(); err == nil {
+		if err = fn(); err == nil {
 			return nil
 		}
 		time.Sleep(time.Second * time.Second)

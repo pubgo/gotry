@@ -10,6 +10,10 @@ type _try_fn struct {
 	_values []reflect.Value
 }
 
+func (t *_try_fn) Error() error {
+	return t.err
+}
+
 func (t *_try_fn) Then(fn func(vs ...interface{})) *_try {
 	if t.err != nil {
 		return &_try{err: t.err}
