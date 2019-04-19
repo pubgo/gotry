@@ -2,22 +2,19 @@ package gotry
 
 import (
 	"errors"
+	"fmt"
 	"github.com/pubgo/assert"
 	"reflect"
-	"fmt"
 )
 
 type _try struct {
-	err    error
-	params []reflect.Value
+	err error
 }
 
 func (t *_try) Catch(fn func(err error)) {
-
 	if t.err == nil {
 		return
 	}
-
 	fn(t.err)
 }
 
@@ -32,24 +29,27 @@ func (t *_try) P() {
 }
 
 func Try(fn func()) *_try {
+	return &_try{err: _Try(fn)}
+}
+
+func _Try(fn func()) (err error) {
 	assert.Bool(fn == nil, "the func is nil")
 
 	_v := reflect.TypeOf(fn)
 	assert.Bool(_v.Kind() != reflect.Func, "the params type(%s) is not func", _v.String())
 
-	t := &_try{}
 	defer func() {
 		defer func() {
 			if r := recover(); r != nil {
 				switch d := r.(type) {
 				case error:
-					t.err = d
+					err = d
 				case string:
-					t.err = errors.New(d)
+					err = errors.New(d)
 				}
 			}
 		}()
-		t.params = reflect.ValueOf(fn).Call([]reflect.Value{})
+		reflect.ValueOf(fn).Call([]reflect.Value{})
 	}()
-	return t
+	return
 }
