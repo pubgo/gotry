@@ -2,6 +2,7 @@ package gotry_test
 
 import (
 	"fmt"
+	"github.com/pubgo/assert"
 	"github.com/pubgo/gotry"
 	"testing"
 	"time"
@@ -19,4 +20,12 @@ func TestName(t *testing.T) {
 	}
 
 	fmt.Println(time.Now().UnixNano() - tt)
+}
+
+func TestWaitFor(t *testing.T) {
+	assert.P(gotry.WaitFor(func(c time.Duration) bool {
+		assert.Bool(c > time.Second*time.Duration(10), "")
+
+		return true
+	}))
 }

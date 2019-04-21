@@ -1,25 +1,9 @@
 package gotry
 
 import (
+	"github.com/pubgo/assert"
 	"time"
 )
-
-func Retry(num int, fn func() error) (err error) {
-	for i := 0; i < num; i++ {
-		if err = fn(); err == nil {
-			return nil
-		}
-		time.Sleep(time.Second * time.Second)
-	}
-	return
-}
-
-func Ticker(dur time.Duration, fn func(c int) bool) bool {
-	for i := 0; fn(i); i++ {
-		time.Sleep(dur)
-	}
-	return false
-}
 
 func fibonacci() func() int {
 	a1, a2 := 0, 1
@@ -27,4 +11,35 @@ func fibonacci() func() int {
 		a1, a2 = a2, a1+a2
 		return a1
 	}
+}
+
+func Retry(num int, fn func() error) {
+	_t := fibonacci()
+	for i := 0; i < num; i++ {
+		if err := _Try(func() {
+			assert.MustNotError(fn())
+		}); err == nil {
+			return
+		}
+		time.Sleep(time.Second * time.Duration(_t()))
+	}
+	return
+}
+
+func WaitFor(fn func(c time.Duration) bool) (b bool) {
+	var _b = true
+	for i := 0; _b; i++ {
+		if err := _Try(func() {
+			_b = fn(time.Second * time.Duration(i))
+		}); err != nil {
+			return false
+		}
+
+		if !_b {
+			return false
+		}
+
+		time.Sleep(time.Second)
+	}
+	return false
 }
