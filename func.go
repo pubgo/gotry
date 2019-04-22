@@ -26,7 +26,7 @@ func Retry(num int, fn func() error) {
 	return
 }
 
-func WaitFor(fn func(c time.Duration) bool) (b bool) {
+func WaitFor(fn func(dur time.Duration) bool) (b bool) {
 	var _b = true
 	for i := 0; _b; i++ {
 		if err := _Try(func() {
@@ -42,4 +42,22 @@ func WaitFor(fn func(c time.Duration) bool) (b bool) {
 		time.Sleep(time.Second)
 	}
 	return false
+}
+
+func Ticker(fn func(dur time.Time) bool) {
+	var _b = true
+	for i := 0; _b; i++ {
+		if err := _Try(func() {
+			_b = fn(time.Now())
+		}); err != nil {
+			return
+		}
+
+		if !_b {
+			return
+		}
+
+		time.Sleep(time.Second)
+	}
+	return
 }
