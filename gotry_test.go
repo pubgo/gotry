@@ -1,6 +1,7 @@
 package gotry_test
 
 import (
+	"errors"
 	"fmt"
 	"github.com/pubgo/assert"
 	"github.com/pubgo/gotry"
@@ -35,5 +36,13 @@ func TestClock(t *testing.T) {
 	gotry.Ticker(func(dur time.Time) time.Duration {
 		fmt.Println(dur.Clock())
 		return time.Second * 10
+	})
+}
+
+func TestNam12e(t *testing.T) {
+	gotry.Try(func() {
+		assert.Err(errors.New("dd"), "mmk")
+	}).Catch(func(err error) {
+		fmt.Println(err.Error())
 	})
 }

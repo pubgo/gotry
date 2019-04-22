@@ -2,3 +2,8 @@ github.com/juju/errors v0.0.0-20190207033735-e65537c515d7 h1:dMIPRDg6gi7CUp0Kj2+
 github.com/juju/errors v0.0.0-20190207033735-e65537c515d7/go.mod h1:W54LbzXuIE0boCoNJfwqpmkKJ1O4TCTZMetAt6jGk7Q=
 github.com/pubgo/assert v0.0.3 h1:JWqCD9iZAiixq358vSSOTh+fgHCSDgixyxdna10Beik=
 github.com/pubgo/assert v0.0.3/go.mod h1:QV8B3QTgu6t/sys9UZOHhCSBtXm/NR2qrn74yPUpgi4=
+github.com/pubgo/assert v0.0.9 h1:wFVq9iGVCv5mp/vubdpY9PyUVNtVM4uUvMakOCOpbHg=
+github.com/pubgo/assert v0.0.9/go.mod h1:Bl2TqENyM5/NAoHu5CYBxSbqvMniNT8Q9R8M8tQwEG4=
+github.com/pubgo/assert v0.0.10 h1:cD2iVK8mo7a4g8dXviqLrg56dlOr+T8qt1KMnnncPPg=
+github.com/pubgo/assert v0.0.10/go.mod h1:Bl2TqENyM5/NAoHu5CYBxSbqvMniNT8Q9R8M8tQwEG4=
+github.com/pubgo/gotry v0.0.9/go.mod h1:ebMbfJ6vIbeYMswERB6KHLukUP4Qmtvohw5S7Dr/aEo=
