@@ -25,7 +25,6 @@ func TestName(t *testing.T) {
 func TestWaitFor(t *testing.T) {
 	assert.P(gotry.WaitFor(func(c time.Duration) bool {
 		assert.Bool(c > time.Second*time.Duration(10), "")
-
 		return true
 	}))
 }
