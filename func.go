@@ -44,20 +44,23 @@ func WaitFor(fn func(dur time.Duration) bool) (b bool) {
 	return false
 }
 
-func Ticker(fn func(dur time.Time) bool) {
-	var _b = true
-	for i := 0; _b; i++ {
+func Ticker(fn func(dur time.Time) time.Duration) {
+	_dur := time.Duration(0)
+	for i := 0; ; i++ {
 		if err := _Try(func() {
-			_b = fn(time.Now())
+			_dur = fn(time.Now())
 		}); err != nil {
 			return
 		}
 
-		if !_b {
+		if _dur < 0 {
 			return
 		}
 
-		time.Sleep(time.Second)
+		if _dur == 0 {
+			_dur = time.Second
+		}
+
+		time.Sleep(_dur)
 	}
-	return
 }

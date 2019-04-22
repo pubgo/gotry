@@ -28,3 +28,12 @@ func TestWaitFor(t *testing.T) {
 		return true
 	}))
 }
+
+func TestClock(t *testing.T) {
+	fmt.Println(time.Now().Clock())
+
+	gotry.Ticker(func(dur time.Time) time.Duration {
+		fmt.Println(dur.Clock())
+		return time.Second * 10
+	})
+}
