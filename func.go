@@ -1,6 +1,7 @@
 package gotry
 
 import (
+	"github.com/pubgo/assert"
 	"time"
 )
 
@@ -12,33 +13,45 @@ func fibonacci() func() int {
 	}
 }
 
-func Retry(num int, fn func() error) error {
+func Retry(num int, fn func() error) (err error) {
 	_t := fibonacci()
-	var err error
 	for i := 0; i < num; i++ {
-		if err = fn(); err == nil {
+		if err = _Try(func() {
+			assert.NotNil(fn())
+		}); err == nil {
 			return nil
 		}
 		time.Sleep(time.Second * time.Duration(_t()))
 	}
-	return err
+	return
 }
 
-func WaitFor(fn func(dur time.Duration) bool) (b bool) {
+func WaitFor(fn func(dur time.Duration) bool) (err error) {
 	var _b = true
 	for i := 0; _b; i++ {
-		if _b = fn(time.Second * time.Duration(i)); !_b {
-			return false
+		if err = _Try(func() {
+			_b = fn(time.Second * time.Duration(i))
+		}); err != nil {
+			return
 		}
+
+		if !_b {
+			return
+		}
+
 		time.Sleep(time.Second)
 	}
-	return false
+	return
 }
 
-func Ticker(fn func(dur time.Time) time.Duration) {
+func Ticker(fn func(dur time.Time) time.Duration) (err error) {
 	_dur := time.Duration(0)
 	for i := 0; ; i++ {
-		_dur = fn(time.Now())
+		if err = _Try(func() {
+			_dur = fn(time.Now())
+		}); err != nil {
+			return
+		}
 
 		if _dur < 0 {
 			return
