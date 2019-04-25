@@ -11,7 +11,7 @@ type _try_fn struct {
 }
 
 func (t *_try_fn) Assert() {
-	assert.MustNotError(t.err)
+	assert.NotNil(t.err)
 }
 
 func (t *_try_fn) Error() error {
@@ -24,7 +24,7 @@ func (t *_try_fn) Then(fn func(vs ...interface{})) *_try {
 	}
 
 	_fn := reflect.ValueOf(fn)
-	assert.Bool(_fn.Kind() != reflect.Func, "err -> Wrap: please input func")
+	assert.Bool(_fn.Kind() != reflect.Func, "the params is not func type")
 
 	return Try(func() {
 		_fn.Call(t._values)
@@ -33,7 +33,7 @@ func (t *_try_fn) Then(fn func(vs ...interface{})) *_try {
 
 func Fn(f interface{}, params ...interface{}) *_try_fn {
 	t := reflect.TypeOf(f)
-	assert.Bool(t.Kind() != reflect.Func, "err -> Wrap: please input func")
+	assert.Bool(t.Kind() != reflect.Func, "the params is not func type")
 
 	_t := &_try_fn{}
 	_t.err = _Try(func() {

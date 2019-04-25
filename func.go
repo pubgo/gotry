@@ -19,7 +19,7 @@ func Retry(num int, fn func() error) (err error) {
 		if err = _Try(func() {
 			assert.NotNil(fn())
 		}); err == nil {
-			return nil
+			return
 		}
 		time.Sleep(time.Second * time.Duration(_t()))
 	}
