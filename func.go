@@ -13,48 +13,48 @@ func fibonacci() func() int {
 	}
 }
 
-func Retry(num int, fn func() error) (err error) {
+func Retry(num int, fn func() error) error {
 	_t := fibonacci()
 	for i := 0; i < num; i++ {
-		if err = _Try(func() {
+		if err := _Try(func() {
 			assert.NotNil(fn())
-		}); err == nil {
-			return
+		}); !err.IsNil() {
+			return err
 		}
 		time.Sleep(time.Second * time.Duration(_t()))
 	}
-	return
+	return nil
 }
 
-func WaitFor(fn func(dur time.Duration) bool) (err error) {
+func WaitFor(fn func(dur time.Duration) bool) error {
 	var _b = true
 	for i := 0; _b; i++ {
-		if err = _Try(func() {
+		if err := _Try(func() {
 			_b = fn(time.Second * time.Duration(i))
-		}); err != nil {
-			return
+		}); !err.IsNil() {
+			return err
 		}
 
 		if !_b {
-			return
+			return nil
 		}
 
 		time.Sleep(time.Second)
 	}
-	return
+	return nil
 }
 
-func Ticker(fn func(dur time.Time) time.Duration) (err error) {
+func Ticker(fn func(dur time.Time) time.Duration) error {
 	_dur := time.Duration(0)
 	for i := 0; ; i++ {
-		if err = _Try(func() {
+		if err := _Try(func() {
 			_dur = fn(time.Now())
-		}); err != nil {
-			return
+		}); !err.IsNil() {
+			return err
 		}
 
 		if _dur < 0 {
-			return
+			return nil
 		}
 
 		if _dur == 0 {

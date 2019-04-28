@@ -46,7 +46,7 @@ func (t *task) _do() {
 			t.curDur = 0
 		}
 
-		log.Printf("q_l:%d cur_dur:%s", len(t.q), t.curDur)
+		log.Printf("q_l:%d cur_dur:%s", len(t.q), t.curDur.String())
 		time.Sleep(time.Millisecond * 200)
 	}
 }
