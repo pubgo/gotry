@@ -1,7 +1,6 @@
 package gotry
 
 import (
-	"errors"
 	"github.com/pubgo/assert"
 	"reflect"
 )
@@ -44,8 +43,6 @@ func _Try(fn func()) (err *assert.KErr) {
 					err = d
 				case error:
 					err.SetErr(d)
-				case string:
-					err.SetErr(errors.New(d))
 				}
 			}
 		}()

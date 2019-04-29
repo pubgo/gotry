@@ -54,7 +54,6 @@ func TestNam12e(t *testing.T) {
 	gotry.Try(func() {
 		assert.Err(errors.New("dd"), "mmk")
 	}).Catch(func(err *assert.KErr) {
-		fmt.Println(err.Error())
-		fmt.Println(err.GetStacks())
+		err.LogStacks()
 	})
 }
