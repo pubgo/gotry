@@ -17,8 +17,8 @@ func Retry(num int, fn func() error) error {
 	_t := fibonacci()
 	for i := 0; i < num; i++ {
 		if err := _Try(func() {
-			assert.NotNil(fn())
-		}); !err.IsNil() {
+			assert.Err(fn())
+		}); err != nil {
 			return err
 		}
 		time.Sleep(time.Second * time.Duration(_t()))
@@ -31,7 +31,7 @@ func WaitFor(fn func(dur time.Duration) bool) error {
 	for i := 0; _b; i++ {
 		if err := _Try(func() {
 			_b = fn(time.Second * time.Duration(i))
-		}); !err.IsNil() {
+		}); err != nil {
 			return err
 		}
 
@@ -49,7 +49,7 @@ func Ticker(fn func(dur time.Time) time.Duration) error {
 	for i := 0; ; i++ {
 		if err := _Try(func() {
 			_dur = fn(time.Now())
-		}); !err.IsNil() {
+		}); err != nil {
 			return err
 		}
 

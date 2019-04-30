@@ -11,7 +11,7 @@ type _try_fn struct {
 }
 
 func (t *_try_fn) Assert() {
-	assert.NotNil(t.err)
+	assert.Err(t.err)
 }
 
 func (t *_try_fn) Error() error {
