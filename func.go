@@ -64,3 +64,9 @@ func Ticker(fn func(dur time.Time) time.Duration) error {
 		time.Sleep(_dur)
 	}
 }
+
+func FnCost(f func()) time.Duration {
+	t1 := time.Now()
+	f()
+	return time.Now().Sub(t1)
+}

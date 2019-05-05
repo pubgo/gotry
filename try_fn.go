@@ -49,3 +49,7 @@ func Fn(f interface{}, params ...interface{}) *_try_fn {
 	})
 	return _t
 }
+
+func init1(func() ) {
+
+}

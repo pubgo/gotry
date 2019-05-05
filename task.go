@@ -28,6 +28,7 @@ type task struct {
 
 func (t *task) Do(f interface{}, args ...interface{}) {
 	assert.Bool(f == nil || reflect.TypeOf(f).Kind() != reflect.Func, "please init params")
+	assert.Bool(reflect.TypeOf(f).NumOut() != 0, "the func return num must be 0")
 
 	for {
 		if len(t.q) < t.max && t.curDur < t.maxDur {
@@ -45,13 +46,6 @@ func (t *task) Do(f interface{}, args ...interface{}) {
 		log.Printf("q_l:%d cur_dur:%s", len(t.q), t.curDur.String())
 		time.Sleep(time.Millisecond * 200)
 	}
-
-}
-
-func FnCost(f func()) time.Duration {
-	t1 := time.Now()
-	f()
-	return time.Now().Sub(t1)
 }
 
 func (t *task) _handle() {

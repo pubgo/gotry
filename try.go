@@ -1,7 +1,6 @@
 package gotry
 
 import (
-	"errors"
 	"github.com/pubgo/assert"
 	"reflect"
 )
@@ -10,19 +9,47 @@ type _try struct {
 	err error
 }
 
-func (t *_try) Catch(fn func(err *assert.KErr)) {
+// real error
+func (t *_try) Catch(fn func(err error)) *_try {
+	if t.err == nil {
+		return t
+	}
+
+	_err := t.Error()
+	if _err == nil {
+		return t
+	}
+
+	fn(_err)
+	return t
+}
+
+func (t *_try) Finally(fn func(err *assert.KErr)) {
 	if t.err == nil {
 		return
 	}
-	fn(t.err.(*assert.KErr))
+
+	fn(t.KError())
 }
 
 func (t *_try) Error() error {
-	return t.err
+	if err := t.KError(); err != nil {
+		return err.Err
+	}
+
+	return nil
+}
+
+func (t *_try) KError() *assert.KErr {
+	if t.err == nil {
+		return nil
+	}
+
+	return t.err.(*assert.KErr)
 }
 
 func (t *_try) P() {
-	t.err.(*assert.KErr).LogStacks()
+	assert.P(t.err)
 }
 
 func Try(fn func()) *_try {
@@ -42,10 +69,8 @@ func _Try(fn func()) (err error) {
 				switch d := r.(type) {
 				case *assert.KErr:
 					m = d
-				case error:
-					m.Sub = d
-				case string:
-					m.Sub = errors.New(d)
+				default:
+					panic("type error, must be *assert.KErr type")
 				}
 			}
 
