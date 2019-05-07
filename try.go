@@ -6,16 +6,42 @@ import (
 )
 
 type _try struct {
-	err error
+	err     error
+	_values []reflect.Value
+}
+
+func (t *_try) Assert() {
+	assert.Err(t.err)
+}
+
+func (t *_try) P() {
+	assert.P(t.err)
+}
+
+func (t *_try) Then(fn interface{}) *_try {
+	if t.err != nil || len(t._values) == 0 {
+		return t
+	}
+
+	_fn := reflect.ValueOf(fn)
+	assert.Bool(_fn.Kind() != reflect.Func, "the params is not func type")
+	assert.Bool(_fn.Type().NumIn() != len(t._values), "the params num is not match")
+
+	_t := &_try{}
+	_t.err = _Try(func() {
+		_t._values = _fn.Call(t._values)
+	})
+
+	return _t
 }
 
 // real error
 func (t *_try) Catch(fn func(err error)) *_try {
-	if t.err == nil {
+	if t.err == nil || len(t._values) != 0 {
 		return t
 	}
 
-	_err := t.Error()
+	_err := t.Err()
 	if _err == nil {
 		return t
 	}
@@ -29,31 +55,48 @@ func (t *_try) Finally(fn func(err *assert.KErr)) {
 		return
 	}
 
-	fn(t.KError())
+	fn(t.KErr())
 }
 
-func (t *_try) Error() error {
-	if err := t.KError(); err != nil {
+func (t *_try) Err() error {
+	if err := t.KErr(); err != nil {
 		return err.Err
 	}
-
 	return nil
 }
 
-func (t *_try) KError() *assert.KErr {
+func (t *_try) KErr() *assert.KErr {
 	if t.err == nil {
 		return nil
 	}
-
 	return t.err.(*assert.KErr)
 }
 
-func (t *_try) P() {
-	assert.P(t.err)
+func (t *_try) Throw() error {
+	return t.err
 }
 
-func Try(fn func()) *_try {
-	return &_try{err: _Try(fn)}
+func Try(f interface{}, params ...interface{}) *_try {
+	t := reflect.TypeOf(f)
+	assert.Bool(t.Kind() != reflect.Func, "the params is not func type")
+
+	_t := &_try{}
+	_t.err = _Try(func() {
+		var vs []reflect.Value
+		for i, p := range params {
+			if p == nil {
+				if t.IsVariadic() {
+					i = 0
+				}
+
+				vs = append(vs, reflect.New(t.In(i)).Elem())
+			} else {
+				vs = append(vs, reflect.ValueOf(p))
+			}
+		}
+		_t._values = reflect.ValueOf(f).Call(vs)
+	})
+	return _t
 }
 
 func _Try(fn func()) (err error) {
@@ -69,12 +112,15 @@ func _Try(fn func()) (err error) {
 				switch d := r.(type) {
 				case *assert.KErr:
 					m = d
+				case error:
+					m.Err = d
+					m.Msg = d.Error()
 				default:
 					panic("type error, must be *assert.KErr type")
 				}
 			}
 
-			if m.Sub == nil {
+			if m.Err == nil {
 				err = nil
 			} else {
 				err = m

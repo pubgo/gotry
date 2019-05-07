@@ -1,7 +1,6 @@
 package gotry
 
 import (
-	"github.com/pubgo/assert"
 	"time"
 )
 
@@ -13,48 +12,46 @@ func fibonacci() func() int {
 	}
 }
 
-func Retry(num int, fn func() error) error {
+func Retry(num int, fn func()) (err error) {
 	_t := fibonacci()
 	for i := 0; i < num; i++ {
-		if err := _Try(func() {
-			assert.Err(fn())
-		}); err != nil {
-			return err
-		}
+		err = _Try(fn)
 		time.Sleep(time.Second * time.Duration(_t()))
 	}
-	return nil
+	return
 }
 
-func WaitFor(fn func(dur time.Duration) bool) error {
+func WaitFor(fn func(dur time.Duration) bool) {
 	var _b = true
 	for i := 0; _b; i++ {
-		if err := _Try(func() {
+		if err := Try(func() {
 			_b = fn(time.Second * time.Duration(i))
-		}); err != nil {
-			return err
+		}).KErr(); err != nil {
+			err.FuncCaller = funcCaller()
+			err.Panic()
 		}
 
 		if !_b {
-			return nil
+			return
 		}
 
 		time.Sleep(time.Second)
 	}
-	return nil
+	return
 }
 
-func Ticker(fn func(dur time.Time) time.Duration) error {
+func Ticker(fn func(dur time.Time) time.Duration) {
 	_dur := time.Duration(0)
 	for i := 0; ; i++ {
-		if err := _Try(func() {
+		if err := Try(func() {
 			_dur = fn(time.Now())
-		}); err != nil {
-			return err
+		}).KErr(); err != nil {
+			err.FuncCaller = funcCaller()
+			err.Panic()
 		}
 
 		if _dur < 0 {
-			return nil
+			return
 		}
 
 		if _dur == 0 {

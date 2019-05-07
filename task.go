@@ -14,9 +14,31 @@ func NewTask(max int, maxDur time.Duration) *task {
 	return _t
 }
 
+func FuncOf(f interface{}, efn func(err error)) TaskFn {
+	t := reflect.TypeOf(f)
+	assert.Bool(t.Kind() != reflect.Func, "the params is not func type")
+
+	return func(args ...interface{}) *_task_fn {
+		return &_task_fn{
+			fn:   f,
+			args: args,
+			efn:  efn,
+		}
+	}
+}
+
 type _task_fn struct {
 	fn   interface{}
 	args []interface{}
+	efn  func(err error)
+}
+
+func (t *_task_fn) _do() {
+	Try(t.fn, t.args...).Finally(func(err *assert.KErr) {
+		if t.efn != nil {
+			t.efn(err)
+		}
+	})
 }
 
 type task struct {
@@ -26,16 +48,11 @@ type task struct {
 	q      chan *_task_fn
 }
 
-func (t *task) Do(f interface{}, args ...interface{}) {
-	assert.Bool(f == nil || reflect.TypeOf(f).Kind() != reflect.Func, "please init params")
-	assert.Bool(reflect.TypeOf(f).NumOut() != 0, "the func return num must be 0")
+func (t *task) Do(f TaskFn, args ...interface{}) {
 
 	for {
 		if len(t.q) < t.max && t.curDur < t.maxDur {
-			t.q <- &_task_fn{
-				fn:   f,
-				args: args,
-			}
+			t.q <- f(args...)
 			break
 		}
 
@@ -54,9 +71,7 @@ func (t *task) _handle() {
 			select {
 			case _fn := <-t.q:
 				go func() {
-					t.curDur = FnCost(func() {
-						Fn(_fn.fn, _fn.args...).Assert()
-					})
+					t.curDur = FnCost(_fn._do)
 				}()
 			case <-time.NewTicker(time.Second * 2).C:
 
