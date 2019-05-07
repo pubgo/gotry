@@ -20,12 +20,13 @@ func TestRetry(t *testing.T) {
 	})
 }
 
-func TestName(t *testing.T) {
+func TestTask(t *testing.T) {
 	var ss = gotry.FuncOf(func(i int) {
 		assert.Bool(i > 10000, "max index")
 		fmt.Println(i)
 	}, func(err error) {
 		fmt.Println(err)
+		fmt.Println(err.(*assert.KErr).Err.Error()==errors.New("max index").Error())
 	})
 
 	tsk := gotry.NewTask(1000000, time.Second*2)
@@ -65,10 +66,15 @@ func TestClock(t *testing.T) {
 }
 
 func TestNam12e(t *testing.T) {
+	var ER = errors.New("dd")
 	gotry.Try(func() {
-		assert.ErrWrap(errors.New("dd"), "mmk")
+		assert.ErrWrap(ER, "mmk")
 	}).Catch(func(err error) {
-		fmt.Println(err.Error())
+		switch err {
+		case ER:
+			fmt.Println(err.Error())
+			fmt.Println(err == ER)
+		}
 	})
 }
 

@@ -65,15 +65,27 @@ func (t *_try) Err() error {
 	return nil
 }
 
+func (t *_try) Error() string {
+	if t.err == nil || t.KErr().Err == nil {
+		return ""
+	}
+
+	return t.err.Error()
+}
+
+func (t *_try) StackTrace() string {
+	if t.err == nil {
+		return ""
+	}
+
+	return t.KErr().StackTrace()
+}
+
 func (t *_try) KErr() *assert.KErr {
 	if t.err == nil {
 		return nil
 	}
 	return t.err.(*assert.KErr)
-}
-
-func (t *_try) Throw() error {
-	return t.err
 }
 
 func Try(f interface{}, params ...interface{}) *_try {

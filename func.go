@@ -15,7 +15,9 @@ func fibonacci() func() int {
 func Retry(num int, fn func()) (err error) {
 	_t := fibonacci()
 	for i := 0; i < num; i++ {
-		err = _Try(fn)
+		if err = _Try(fn); err == nil {
+			return
+		}
 		time.Sleep(time.Second * time.Duration(_t()))
 	}
 	return

@@ -1,3 +1,3 @@
 module github.com/pubgo/gotry
 
-require github.com/pubgo/assert v0.1.9
+require github.com/pubgo/assert v0.1.11
