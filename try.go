@@ -10,10 +10,6 @@ type _try struct {
 	_values []reflect.Value
 }
 
-func (t *_try) Assert() {
-	assert.Err(t.err)
-}
-
 func (t *_try) P() {
 	assert.P(t.err)
 }
@@ -24,8 +20,8 @@ func (t *_try) Then(fn interface{}) *_try {
 	}
 
 	_fn := reflect.ValueOf(fn)
-	assert.Bool(_fn.Kind() != reflect.Func, "the params is not func type")
-	assert.Bool(_fn.Type().NumIn() != len(t._values), "the params num is not match")
+	assert.ST(_fn.Kind() != reflect.Func, "the params is not func type")
+	assert.ST(_fn.Type().NumIn() != len(t._values), "the params num is not match")
 
 	_t := &_try{}
 	_t.err = _Try(func() {
@@ -50,6 +46,21 @@ func (t *_try) Catch(fn func(err error)) *_try {
 	return t
 }
 
+// real error
+func (t *_try) CatchTag(fn func(tag string, err *assert.KErr)) *_try {
+	if t.err == nil || len(t._values) != 0 || t.KErr().Tag == "" {
+		return t
+	}
+
+	_err := t.Err()
+	if _err == nil {
+		return t
+	}
+
+	fn(t.KErr().Tag, t.KErr())
+	return t
+}
+
 func (t *_try) Finally(fn func(err *assert.KErr)) {
 	if t.err == nil {
 		return
@@ -65,22 +76,6 @@ func (t *_try) Err() error {
 	return nil
 }
 
-func (t *_try) Error() string {
-	if t.err == nil || t.KErr().Err == nil {
-		return ""
-	}
-
-	return t.err.Error()
-}
-
-func (t *_try) StackTrace() string {
-	if t.err == nil {
-		return ""
-	}
-
-	return t.KErr().StackTrace()
-}
-
 func (t *_try) KErr() *assert.KErr {
 	if t.err == nil {
 		return nil
@@ -90,7 +85,7 @@ func (t *_try) KErr() *assert.KErr {
 
 func Try(f interface{}, params ...interface{}) *_try {
 	t := reflect.TypeOf(f)
-	assert.Bool(t.Kind() != reflect.Func, "the params is not func type")
+	assert.ST(t.Kind() != reflect.Func, "the params is not func type")
 
 	_t := &_try{}
 	_t.err = _Try(func() {
@@ -112,10 +107,10 @@ func Try(f interface{}, params ...interface{}) *_try {
 }
 
 func _Try(fn func()) (err error) {
-	assert.Bool(fn == nil, "the func is nil")
+	assert.ST(fn == nil, "the func is nil")
 
 	_v := reflect.TypeOf(fn)
-	assert.Bool(_v.Kind() != reflect.Func, "the params type(%s) is not func", _v.String())
+	assert.ST(_v.Kind() != reflect.Func, "the params type(%s) is not func", _v.String())
 
 	defer func() {
 		defer func() {

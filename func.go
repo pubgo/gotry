@@ -1,6 +1,7 @@
 package gotry
 
 import (
+	"github.com/pubgo/assert"
 	"time"
 )
 
@@ -26,12 +27,12 @@ func Retry(num int, fn func()) (err error) {
 func WaitFor(fn func(dur time.Duration) bool) {
 	var _b = true
 	for i := 0; _b; i++ {
-		if err := Try(func() {
+		Try(func() {
 			_b = fn(time.Second * time.Duration(i))
-		}).KErr(); err != nil {
-			err.FuncCaller = funcCaller()
+		}).Finally(func(err *assert.KErr) {
+			err.Caller = funcCaller()
 			err.Panic()
-		}
+		})
 
 		if !_b {
 			return
@@ -45,12 +46,12 @@ func WaitFor(fn func(dur time.Duration) bool) {
 func Ticker(fn func(dur time.Time) time.Duration) {
 	_dur := time.Duration(0)
 	for i := 0; ; i++ {
-		if err := Try(func() {
+		Try(func() {
 			_dur = fn(time.Now())
-		}).KErr(); err != nil {
-			err.FuncCaller = funcCaller()
+		}).Finally(func(err *assert.KErr) {
+			err.Caller = funcCaller()
 			err.Panic()
-		}
+		})
 
 		if _dur < 0 {
 			return

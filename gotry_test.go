@@ -11,22 +11,38 @@ import (
 
 func TestRetry(t *testing.T) {
 	gotry.Try(func() {
-		assert.Err(gotry.Retry(10, func() {
-			assert.Err(assert.ErrOf("test retry"))
-			time.Sleep(3)
+		assert.Throw(gotry.Retry(3, func() {
+			fmt.Println("ok")
+			assert.T(true, func(m *assert.M) {
+				m.Msg("test retry")
+			})
 		}))
+
 	}).Catch(func(err error) {
 		fmt.Println(err.Error())
-	})
+	}).P()
+
+	fmt.Println(gotry.Try(func() {
+		assert.Throw(gotry.Retry(3, func() {
+			fmt.Println("ok")
+
+			assert.T(true, func(m *assert.M) {
+				m.Msg("test retry")
+			})
+		}))
+	}).Err())
 }
 
 func TestTask(t *testing.T) {
 	var ss = gotry.FuncOf(func(i int) {
-		assert.Bool(i > 10000, "max index")
+		assert.T(i > 10000, func(m *assert.M) {
+			m.Msg("max index")
+		})
+
 		fmt.Println(i)
 	}, func(err error) {
 		fmt.Println(err)
-		fmt.Println(err.(*assert.KErr).Err.Error()==errors.New("max index").Error())
+		fmt.Println(err.(*assert.KErr).Err.Error() == errors.New("max index").Error())
 	})
 
 	tsk := gotry.NewTask(1000000, time.Second*2)
@@ -43,7 +59,10 @@ func TestWaitFor(t *testing.T) {
 	gotry.Try(func() {
 		gotry.WaitFor(func(c time.Duration) bool {
 			fmt.Println(c)
-			assert.Bool(c > time.Second*time.Duration(2), "time out")
+			assert.T(c > time.Second*time.Duration(2), func(m *assert.M) {
+				m.Msg("time out")
+			})
+
 			return true
 		})
 	}).Catch(func(err error) {
@@ -57,7 +76,9 @@ func TestClock(t *testing.T) {
 	gotry.Try(func() {
 		gotry.Ticker(func(dur time.Time) time.Duration {
 			fmt.Println(dur.Clock())
-			assert.Err(assert.ErrOf("ddd test"))
+			assert.T(true, func(m *assert.M) {
+				m.Msg("ddd test")
+			})
 			return time.Second * 1
 		})
 	}).Catch(func(err error) {
@@ -68,13 +89,18 @@ func TestClock(t *testing.T) {
 func TestNam12e(t *testing.T) {
 	var ER = errors.New("dd")
 	gotry.Try(func() {
-		assert.ErrWrap(ER, "mmk")
+		assert.ErrWrap(ER, func(m *assert.M) {
+			m.Msg("mmk")
+			m.Tag("tag")
+		})
 	}).Catch(func(err error) {
 		switch err {
 		case ER:
 			fmt.Println(err.Error())
 			fmt.Println(err == ER)
 		}
+	}).CatchTag(func(tag string, err *assert.KErr) {
+		fmt.Println(tag)
 	})
 }
 
@@ -86,13 +112,15 @@ func (*SS) Error() string {
 }
 func TestKind(t *testing.T) {
 	gotry.Try(func() {
-		//assert.ErrWrap(errors.New("sss"), "mmk")
-		assert.ErrWrap(&SS{}, "mmk")
+		assert.SWrap(&SS{}, "mmk")
+		assert.ErrWrap(&SS{}, func(m *assert.M) {
+			m.Msg("mmk")
+		})
+
 	}).Catch(func(err error) {
 		switch err.(type) {
 		case *SS:
 		case error:
-
 		}
 		fmt.Println(err.Error())
 	}).Finally(func(err *assert.KErr) {

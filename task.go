@@ -14,13 +14,13 @@ func NewTask(max int, maxDur time.Duration) *task {
 	return _t
 }
 
-func FuncOf(f interface{}, efn func(err error)) TaskFn {
-	t := reflect.TypeOf(f)
-	assert.Bool(t.Kind() != reflect.Func, "the params is not func type")
+func FuncOf(fn interface{}, efn func(err error)) TaskFn {
+	t := reflect.TypeOf(fn)
+	assert.ST(t.Kind() != reflect.Func, "the params is not func type")
 
 	return func(args ...interface{}) *_task_fn {
 		return &_task_fn{
-			fn:   f,
+			fn:   fn,
 			args: args,
 			efn:  efn,
 		}
