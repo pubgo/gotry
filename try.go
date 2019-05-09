@@ -1,7 +1,6 @@
 package gotry
 
 import (
-	"github.com/pubgo/assert"
 	"reflect"
 )
 
@@ -11,21 +10,21 @@ type _try struct {
 }
 
 func (t *_try) P() {
-	assert.P(t.err)
+	_P(t.err)
 }
 
 func (t *_try) Then(fn interface{}) *_try {
-	assert.AssertFn(fn)
+	_AssertFn(fn)
 
 	if t.err != nil && t.KErr().Err != nil {
 		return t
 	}
 
 	_fn := reflect.ValueOf(fn)
-	assert.ST(_fn.Type().NumIn() != len(t._values), "the params num is not match")
+	_ST(_fn.Type().NumIn() != len(t._values), "the params num is not match")
 
 	_t := &_try{}
-	_t.err = assert.KTry(func() {
+	_t.err = _KTry(func() {
 		_t._values = _fn.Call(t._values)
 	})
 
@@ -48,7 +47,7 @@ func (t *_try) Catch(fn func(err error)) *_try {
 }
 
 // real error
-func (t *_try) CatchTag(fn func(tag string, err *assert.KErr)) *_try {
+func (t *_try) CatchTag(fn func(tag string, err *_KErr)) *_try {
 	_ke := t.KErr()
 
 	if t.err == nil || len(t._values) != 0 || _ke.Tag == "" {
@@ -64,12 +63,12 @@ func (t *_try) CatchTag(fn func(tag string, err *assert.KErr)) *_try {
 	return t
 }
 
-func (t *_try) Finally(fn func(err *assert.KErr)) {
+func (t *_try) Finally(fn func(err *_KErr)) {
 	if t.err == nil {
 		return
 	}
 
-	fn(t.err.(*assert.KErr))
+	fn(t.err.(*_KErr))
 }
 
 func (t *_try) Err() error {
@@ -79,17 +78,17 @@ func (t *_try) Err() error {
 	return nil
 }
 
-func (t *_try) KErr() *assert.KErr {
+func (t *_try) KErr() *_KErr {
 	if t.err == nil {
 		return nil
 	}
-	return t.err.(*assert.KErr)
+	return t.err.(*_KErr)
 }
 
 func Try(f interface{}, args ...interface{}) *_try {
 	_t := &_try{}
-	_t.err = assert.KTry(func() {
-		_t._values = assert.FnOf(f, args...)()
+	_t.err = _KTry(func() {
+		_t._values = _FnOf(f, args...)()
 	})
 	return _t
 }

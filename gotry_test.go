@@ -1,18 +1,16 @@
-package gotry_test
+package gotry
 
 import (
 	"errors"
 	"fmt"
-	"github.com/pubgo/assert"
-	"github.com/pubgo/gotry"
 	"testing"
 	"time"
 )
 
 func TestNam12e(t *testing.T) {
 	var ER = errors.New("dd")
-	gotry.Try(func() {
-		assert.ErrWrap(ER, func(m *assert.M) {
+	Try(func() {
+		_ErrWrap(ER, func(m *_M) {
 			m.Msg("mmk")
 			m.Tag("tag")
 		})
@@ -22,7 +20,7 @@ func TestNam12e(t *testing.T) {
 			fmt.Println(err.Error())
 			fmt.Println(err == ER)
 		}
-	}).CatchTag(func(tag string, err *assert.KErr) {
+	}).CatchTag(func(tag string, err *_KErr) {
 		fmt.Println(tag)
 	})
 }
@@ -34,9 +32,9 @@ func (*SS) Error() string {
 	return "ok" + time.Now().String()
 }
 func TestKind(t *testing.T) {
-	gotry.Try(func() {
-		assert.SWrap(&SS{}, "mmk")
-		assert.ErrWrap(&SS{}, func(m *assert.M) {
+	Try(func() {
+		_SWrap(&SS{}, "mmk")
+		_ErrWrap(&SS{}, func(m *_M) {
 			m.Msg("mmk")
 		})
 
@@ -46,13 +44,13 @@ func TestKind(t *testing.T) {
 		case error:
 		}
 		fmt.Println(err.Error())
-	}).Finally(func(err *assert.KErr) {
+	}).Finally(func(err *_KErr) {
 		err.P()
 	})
 }
 
 func TestFn(t *testing.T) {
-	gotry.Try(func() *SS {
+	Try(func() *SS {
 		return &SS{}
 	}).Then(func(vs *SS) string {
 		return vs.Error()
@@ -60,7 +58,7 @@ func TestFn(t *testing.T) {
 		fmt.Println(s)
 	}).P()
 
-	gotry.Try(fmt.Println, "test", 1, nil).
+	Try(fmt.Println, "test", 1, nil).
 		Then(func(n int, err error) {
 			fmt.Println(n, err)
 		}).P()
