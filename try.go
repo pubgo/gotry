@@ -15,12 +15,13 @@ func (t *_try) P() {
 }
 
 func (t *_try) Then(fn interface{}) *_try {
-	if t.err != nil || len(t._values) == 0 {
+	assert.AssertFn(fn)
+
+	if t.err != nil && t.KErr().Err != nil {
 		return t
 	}
 
 	_fn := reflect.ValueOf(fn)
-	assert.ST(_fn.Kind() != reflect.Func, "the params is not func type")
 	assert.ST(_fn.Type().NumIn() != len(t._values), "the params num is not match")
 
 	_t := &_try{}
@@ -48,7 +49,9 @@ func (t *_try) Catch(fn func(err error)) *_try {
 
 // real error
 func (t *_try) CatchTag(fn func(tag string, err *assert.KErr)) *_try {
-	if t.err == nil || len(t._values) != 0 || t.KErr().Tag == "" {
+	_ke := t.KErr()
+
+	if t.err == nil || len(t._values) != 0 || _ke.Tag == "" {
 		return t
 	}
 
@@ -57,7 +60,7 @@ func (t *_try) CatchTag(fn func(tag string, err *assert.KErr)) *_try {
 		return t
 	}
 
-	fn(t.KErr().Tag, t.KErr())
+	fn(_ke.Tag, _ke)
 	return t
 }
 
@@ -66,7 +69,7 @@ func (t *_try) Finally(fn func(err *assert.KErr)) {
 		return
 	}
 
-	fn(t.KErr())
+	fn(t.err.(*assert.KErr))
 }
 
 func (t *_try) Err() error {
