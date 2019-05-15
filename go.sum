@@ -10,3 +10,5 @@ github.com/pubgo/assert v0.1.18 h1:ZWqaaTUOo9bJa8QTO94+SgjXieCe2zN8OUp5VaGVW7w=
 github.com/pubgo/assert v0.1.18/go.mod h1:7+t+/GMcDoh3RBiyLLQHzXxIjzAaqc/S6EPC//n4aOs=
 github.com/pubgo/assert v0.1.20 h1:I++klniZpLXDS37e1ELIdddusX1T77aqGcj0hy7o/s8=
 github.com/pubgo/assert v0.1.20/go.mod h1:7+t+/GMcDoh3RBiyLLQHzXxIjzAaqc/S6EPC//n4aOs=
+github.com/pubgo/assert v0.1.21 h1:Fx8Ex8xcKwJcpd5NpwbrscFFCTCuG3/3Oa4gCAn1y7Y=
+github.com/pubgo/assert v0.1.21/go.mod h1:7+t+/GMcDoh3RBiyLLQHzXxIjzAaqc/S6EPC//n4aOs=
