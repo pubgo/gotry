@@ -13,6 +13,13 @@ func (t *_try) P() {
 	_P(t.err)
 }
 
+func (t *_try) Panic() {
+	if err := t.KErr(); err != nil {
+		err.Caller = funcCaller()
+		_Throw(err)
+	}
+}
+
 func (t *_try) Then(fn interface{}) *_try {
 	_AssertFn(fn)
 
@@ -71,6 +78,7 @@ func (t *_try) Finally(fn func(err *_KErr)) {
 	fn(t.err.(*_KErr))
 }
 
+// real err
 func (t *_try) Err() error {
 	if err := t.KErr(); err != nil {
 		return err.Err
@@ -78,6 +86,7 @@ func (t *_try) Err() error {
 	return nil
 }
 
+// wrap err
 func (t *_try) KErr() *_KErr {
 	if t.err == nil {
 		return nil

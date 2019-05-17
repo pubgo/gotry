@@ -21,17 +21,17 @@ Try(func() {
 
 ```go
 Try(func() {
-	_SWrap(&SS{}, "mmk")
-	_ErrWrap(&SS{}, func(m *_M) {
-		m.Msg("mmk")
-	})
+  _SWrap(&SS{}, "mmk")
+  _ErrWrap(&SS{}, func(m *_M) {
+        m.Msg("mmk")
+  })
 
 }).Catch(func(err error) {
-	switch err.(type) {
-	case *SS:
-	case error:
-	}
-	fmt.Println(err.Error())
+  switch err.(type) {
+  case *SS:
+  case error:
+  }
+fmt.Println(err.Error())
 }).Finally(func(err *_KErr) {
 	err.P()
 })

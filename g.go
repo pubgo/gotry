@@ -9,6 +9,8 @@ var _FnOf = assert.FnOf
 var _ST = assert.T
 var _ErrWrap = assert.ErrWrap
 var _SWrap = assert.SWrap
+var _Throw = assert.Throw
+
 
 type _KErr = assert.KErr
 type _M = assert.M
