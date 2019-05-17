@@ -91,4 +91,8 @@ func TestFn(t *testing.T) {
 		err.P()
 	})
 
+	Try(hello, "ss", "ddd", "a").Then(func(b bool) {
+		fmt.Println(b)
+	}).Expect("sss %s", "ss")
+
 }

@@ -51,3 +51,40 @@ Try(fmt.Println, "test", 1, nil).
 	fmt.Println(n, err)
 }).P()
 ```
+
+
+```go
+func hello(args ...string) bool {
+	fmt.Println(args)
+
+	for _, arg := range args {
+		if arg == "a" {
+			panic("error panic  info")
+		}
+	}
+
+	return true
+}
+
+
+Try(hello, "ss", "ddd").Then(func(b bool) {
+		fmt.Println(b)
+}).Catch(func(err error) {
+    fmt.Println(err, "err")
+}).Finally(func(err *_KErr) {
+    err.P()
+})
+
+Try(hello, "ss", "ddd", "a").Then(func(b bool) {
+    fmt.Println(b)
+}).Catch(func(err error) {
+    fmt.Println(err, "err")
+}).Finally(func(err *_KErr) {
+    err.P()
+})
+
+Try(hello, "ss", "ddd", "a").Then(func(b bool) {
+    fmt.Println(b)
+}).Expect("sss %s", "ss")
+
+```

@@ -53,6 +53,13 @@ func (t *_try) Catch(fn func(err error)) *_try {
 	return t
 }
 
+func (t *_try) Expect(f string, args ...interface{}) {
+	_SWrap(t.err, func(m *_M) {
+		m.Msg(f, args...)
+		m.Tag("Expect")
+	})
+}
+
 // real error
 func (t *_try) CatchTag(fn func(tag string, err *_KErr)) *_try {
 	_ke := t.KErr()
