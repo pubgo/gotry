@@ -16,7 +16,7 @@ func (t *_try) P() {
 func (t *_try) Panic() {
 	if err := t.KErr(); err != nil {
 		err.Caller = funcCaller()
-		_Throw(err)
+		panic(err)
 	}
 }
 
@@ -54,10 +54,13 @@ func (t *_try) Catch(fn func(err error)) *_try {
 }
 
 func (t *_try) Expect(f string, args ...interface{}) {
-	_SWrap(t.err, func(m *_M) {
+	Try(_SWrap, t.err, func(m *_M) {
 		m.Msg(f, args...)
 		m.Tag("Expect")
-	})
+	}).Finally(func(err *_KErr) {
+		err.Caller = funcCaller()
+		panic(err)
+	});
 }
 
 // real error
