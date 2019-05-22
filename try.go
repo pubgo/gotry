@@ -63,7 +63,7 @@ func (t *_try) Expect(f string, args ...interface{}) {
 	});
 }
 
-// real error
+// tag error
 func (t *_try) CatchTag(tag string, fn func(err *_KErr)) *_try {
 	_ke := t.KErr()
 	if t.err == nil || len(t._values) != 0 || _ke.Tag == "" {
