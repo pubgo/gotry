@@ -21,11 +21,11 @@ func (t *_try) Panic() {
 }
 
 func (t *_try) Then(fn interface{}) *_try {
-	_AssertFn(fn)
-
 	if t.err != nil && t.KErr().Err != nil {
 		return t
 	}
+
+	_AssertFn(fn)
 
 	_fn := reflect.ValueOf(fn)
 	_ST(_fn.Type().NumIn() != len(t._values), "the params num is not match")
@@ -64,19 +64,20 @@ func (t *_try) Expect(f string, args ...interface{}) {
 }
 
 // real error
-func (t *_try) CatchTag(fn func(tag string, err *_KErr)) *_try {
+func (t *_try) CatchTag(tag string, fn func(err *_KErr)) *_try {
 	_ke := t.KErr()
-
 	if t.err == nil || len(t._values) != 0 || _ke.Tag == "" {
 		return t
 	}
 
-	_err := t.Err()
-	if _err == nil {
+	if _err := t.Err(); _err == nil {
 		return t
 	}
 
-	fn(_ke.Tag, _ke)
+	if _ke.Tag == tag {
+		fn(_ke)
+	}
+
 	return t
 }
 

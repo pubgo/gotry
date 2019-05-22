@@ -3,6 +3,7 @@ package gotry
 import (
 	"errors"
 	"fmt"
+	"github.com/pubgo/assert"
 	"testing"
 	"time"
 )
@@ -20,8 +21,6 @@ func TestNam12e(t *testing.T) {
 			fmt.Println(err.Error())
 			fmt.Println(err == ER)
 		}
-	}).CatchTag(func(tag string, err *_KErr) {
-		fmt.Println(tag)
 	})
 }
 
@@ -53,9 +52,10 @@ func hello(args ...string) bool {
 	fmt.Println(args)
 
 	for _, arg := range args {
-		if arg == "a" {
-			panic("error panic  info")
-		}
+		_TT(arg == "a", func(m *assert.M) {
+			m.Msg("error panic  info")
+			m.Tag("test")
+		})
 	}
 
 	return true
@@ -91,8 +91,18 @@ func TestFn(t *testing.T) {
 		err.P()
 	})
 
-	Try(hello, "ss", "ddd", "a").Then(func(b bool) {
-		fmt.Println(b)
-	}).Expect("sss %s", "ss")
+	Try(func() {
+		Try(hello, "ss", "ddd", "a").Then(func(b bool) {
+			fmt.Println(b)
+		}).Expect("sss %s", "ss")
+	}).P()
 
+}
+
+func Test_try_CatchTag(t *testing.T) {
+	Try(hello, "ss", "ddd", "a").Then(func(b bool) {
+		fmt.Println(b,"特斯特根哥哥哥哥")
+	}).CatchTag("test", func(err *_KErr) {
+		fmt.Println("test tag",err.StackTrace())
+	}).P()
 }

@@ -7,6 +7,7 @@ var _P = assert.P
 var _AssertFn = assert.AssertFn
 var _FnOf = assert.FnOf
 var _ST = assert.T
+var _TT = assert.TT
 var _ErrWrap = assert.ErrWrap
 var _SWrap = assert.SWrap
 var _Throw = assert.Throw
