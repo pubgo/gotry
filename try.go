@@ -1,6 +1,8 @@
 package gotry
 
 import (
+	"github.com/prometheus/common/log"
+	"github.com/pubgo/assert"
 	"reflect"
 )
 
@@ -10,28 +12,30 @@ type _try struct {
 }
 
 func (t *_try) P() {
-	_P(t.err)
+	if err := t.KErr(); err != nil {
+		err.P()
+	}
 }
 
 func (t *_try) Panic() {
 	if err := t.KErr(); err != nil {
-		err.Caller = funcCaller()
+		err.Caller(funcCaller())
 		panic(err)
 	}
 }
 
 func (t *_try) Then(fn interface{}) *_try {
-	if t.err != nil && t.KErr().Err != nil {
+	if t.err != nil && t.KErr().Err() != nil {
 		return t
 	}
 
-	_AssertFn(fn)
+	assert.AssertFn(fn)
 
 	_fn := reflect.ValueOf(fn)
-	_ST(_fn.Type().NumIn() != len(t._values), "the params num is not match")
+	assert.T(_fn.Type().NumIn() != len(t._values), "the params num is not match")
 
 	_t := &_try{}
-	_t.err = _KTry(func() {
+	_t.err = assert.KTry(func() {
 		_t._values = _fn.Call(t._values)
 	})
 
@@ -39,34 +43,30 @@ func (t *_try) Then(fn interface{}) *_try {
 }
 
 // real error
-func (t *_try) Catch(fn func(err error)) *_try {
+func (t *_try) Catch(fn func(err *assert.KErr)) *_try {
 	if t.err == nil || len(t._values) != 0 {
 		return t
 	}
 
-	_err := t.Err()
-	if _err == nil {
-		return t
-	}
-
-	fn(_err)
+	fn(t.KErr())
 	return t
 }
 
 func (t *_try) Expect(f string, args ...interface{}) {
-	Try(_SWrap, t.err, func(m *_M) {
+	Try(assert.SWrap, t.err, func(m *assert.M) {
 		m.Msg(f, args...)
 		m.Tag("Expect")
-	}).Finally(func(err *_KErr) {
-		err.Caller = funcCaller()
-		panic(err)
-	});
+	}).Catch(func(err *assert.KErr) {
+		err.Caller(funcCaller())
+		err.P()
+		log.Fatalln(err.StackTrace())
+	})
 }
 
 // tag error
-func (t *_try) CatchTag(tag string, fn func(err *_KErr)) *_try {
+func (t *_try) CatchTag(tag string, fn func(err *assert.KErr)) *_try {
 	_ke := t.KErr()
-	if t.err == nil || len(t._values) != 0 || _ke.Tag == "" {
+	if t.err == nil || len(t._values) != 0 || _ke.Tag() == "" {
 		return t
 	}
 
@@ -74,41 +74,33 @@ func (t *_try) CatchTag(tag string, fn func(err *_KErr)) *_try {
 		return t
 	}
 
-	if _ke.Tag == tag {
+	if _ke.Tag() == tag {
 		fn(_ke)
 	}
 
 	return t
 }
 
-func (t *_try) Finally(fn func(err *_KErr)) {
-	if t.err == nil {
-		return
-	}
-
-	fn(t.err.(*_KErr))
-}
-
 // real err
 func (t *_try) Err() error {
 	if err := t.KErr(); err != nil {
-		return err.Err
+		return err.Err()
 	}
 	return nil
 }
 
 // wrap err
-func (t *_try) KErr() *_KErr {
+func (t *_try) KErr() *assert.KErr {
 	if t.err == nil {
 		return nil
 	}
-	return t.err.(*_KErr)
+	return t.err.(*assert.KErr)
 }
 
 func Try(f interface{}, args ...interface{}) *_try {
 	_t := &_try{}
-	_t.err = _KTry(func() {
-		_t._values = _FnOf(f, args...)()
+	_t.err = assert.KTry(func() {
+		_t._values = assert.FnOf(f, args...)()
 	})
 	return _t
 }
