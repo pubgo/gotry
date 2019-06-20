@@ -1,8 +1,8 @@
 package gotry
 
 import (
-	"github.com/prometheus/common/log"
 	"github.com/pubgo/assert"
+	"os"
 	"reflect"
 )
 
@@ -59,7 +59,7 @@ func (t *_try) Expect(f string, args ...interface{}) {
 	}).Catch(func(err *assert.KErr) {
 		err.Caller(funcCaller())
 		err.P()
-		log.Fatalln(err.StackTrace())
+		os.Exit(1)
 	})
 }
 
